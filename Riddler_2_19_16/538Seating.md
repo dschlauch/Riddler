@@ -1,19 +1,8 @@
----
-title: "Will Someone Be Sitting In Your Seat On The Plane?"
-author: "Dan Schlauch"
-date: "02/19/2016"
-output: 
-    html_document:
-        keep_md: true
----
+# Will Someone Be Sitting In Your Seat On The Plane?
+Dan Schlauch  
+02/19/2016  
 
-```{r, echo=FALSE}
-library(ggplot2)
-library(grid)
-library(gganimate)
-library(tidyr)
 
-```
 [From The Riddler at fivethirtyeight.com](http://fivethirtyeight.com/features/will-someone-be-sitting-in-your-seat-on-the-plane/)
 
 *There’s an airplane with 100 seats, and there are 100 ticketed passengers each with an assigned seat. They line up to board in some random order. However, the first person to board is the worst person alive, and just sits in a random seat, without even looking at his boarding pass. Each subsequent passenger sits in his or her own assigned seat if it’s empty, but sits in a random open seat if the assigned seat is occupied. What is the probability that you, the hundredth passenger to board, finds your seat unoccupied?*
@@ -28,42 +17,7 @@ With this formulation it's clear that you simply need someone to sit in Jerk's s
 
 ***
 
-```{r, interval=.2,echo=FALSE,results="hide", message=FALSE, warning=FALSE, eval=T}
-st <- 1:100
-tkn <- rep("Empty",100)
-jerk <- sample(100,1)
-tkn[jerk] <- "Jerk"
-stsInterval <- matrix("Empty", nrow=100, ncol=100)
-stsInterval[,1] <- tkn
-# incorrectSeats <- matrix(NA, nrow=100, ncol=100)
-# incorrectSeats[,1] <- tkn
-for(i in 2:99) {
-  if(tkn[i]=="Empty"){
-    tkn[i]<-"Correct Seat"
-  }else{
-    incorrectSeat <- sample(which(tkn=="Empty"),1)
-    tkn[incorrectSeat]<-"Incorrect Seat"
-  }
-  stsInterval[,i] <- tkn
-}
-# Get last available seat
-tkn[which(tkn=="Empty")]<-"You"
-stsInterval[,100]<- tkn
 
-df <- data.frame(time=rep(1:100, each=100), seats=rep(1:100,100), row=rep(1:25,each=4), col=1:4, taken=c(stsInterval))
-p <- ggplot(df, aes(x=col, y=row, frame = time), col="blue") + 
-  geom_tile(aes(fill = taken)) +xlab("Seat") +ylab("Row") + theme_bw()+
-  scale_fill_brewer(palette="Set1")
-gg_animate(p, "./seating_ordered.gif", interval = c(rep(.1,99),1))
-
-stsInterval <- stsInterval[sample(1:100),]
-
-df <- data.frame(time=rep(1:100, each=100), seats=rep(1:100,100), row=rep(1:25,each=4), col=1:4, taken=c(stsInterval))
-p <- ggplot(df, aes(x=col, y=row, frame = time), col="blue") + 
-  geom_tile(aes(fill = taken)) +xlab("Seat") +ylab("Row") + theme_bw()+
-  scale_fill_brewer(palette="Set1")
-gg_animate(p, "./seating_unordered.gif", interval = c(rep(.1,99),1), saver="mp4")
-```
 
 ![Ordered Seating](./seating_ordered.gif) ![Unordered Seating](./seating_unordered.gif)
 
@@ -87,8 +41,13 @@ For the $n^{th}$ to last passenger to board (that's passenger #(100-$n$)), there
 
 So, summing over the 99 non-Jerks we have $$\bar{X} = \frac{1}{99} \sum_{i=1}^{99} \frac{1}{1+i}$$
 
-```{r}
+
+```r
 mean(1/(1+1:99))
+```
+
+```
+## [1] 0.04229674
 ```
 
 There is a **4.23%** chance that you, a non-jerk, will have someone in your seat.

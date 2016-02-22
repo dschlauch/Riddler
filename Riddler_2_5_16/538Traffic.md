@@ -1,23 +1,16 @@
----
-title: "How Many Cars Will Get Stuck In Traffic?"
-author: "Dan Schlauch"
-date: "02/05/2016"
-output: 
-    html_document:
-        keep_md: true
----
+# How Many Cars Will Get Stuck In Traffic?
+Dan Schlauch  
+02/05/2016  
 
-```{r, echo=FALSE}
-library(ggplot2)
-library(grid)
-```
+
 [From The Riddler at fivethirtyeight.com](http://fivethirtyeight.com/features/how-many-cars-will-get-stuck-in-traffic/)
 
 First, counting the number of groups in a given set of cars is straightforward.  First find the slowest overall car and call all the cars behind it the first group.  Then look at all the cars in front of that car and find the slowest of those remaining cars.  The cars behind it but in front of the first group form the second group, and so on...  
 
 This is solved with the following recursive function.
 
-```{r}
+
+```r
 numberOfGroupedVehicles <- function(vehicles, counter){
   if(length(vehicles)==0)
     return(counter)
@@ -35,34 +28,38 @@ So, we can see that $$f(x)=f(x-1)+\frac{1}{x}$$
 
 And, by induction, using the fact that 1 car yields 1 traffic group $$f(1)=1$$ we can calculate the expected number of traffic groups.
 
-```{r}
+
+```r
 expectedGroups <- function(n) sum(1/(1:n))
 ```
 
 Now, running 100,000 simulations each involving 10,000 cars we see that the calculated expectation matches the mean number of traffic groups.
 
-```{r}
+
+```r
 numVehicles <- 10000
 numSimulations <- 100000
 groupSizes <- replicate(numSimulations,numberOfGroupedVehicles(sample(numVehicles), 0))
 meanGroups <- mean(groupSizes)
 meanGroups
+```
+
+```
+## [1] 9.77159
+```
+
+```r
 numExpectedGroups <- expectedGroups(numVehicles)
 numExpectedGroups
 ```
 
-For 10,000 cars, the expected number of traffic groups is `r numExpectedGroups`
-
-```{r, echo=FALSE}
-my_grob = grobTree(textGrob("Expected # of groups", x=0.4,  y=.95, hjust=0, gp=gpar(col="red", fontsize=15, fontface="bold")))
-ggplot(data.frame(groupSizes=groupSizes), aes(groupSizes, col="blue")) + geom_histogram(color="black",binwidth=1,fill=I("blue")) + 
-        ggtitle(paste0("Distribution of group sizes for ",numVehicles, " cars (",numSimulations," simulations)")) + 
-        theme(plot.title = element_text(size=15, face="bold")) +
-        xlab("Number of Traffic Groups") + geom_vline(xintercept = numExpectedGroups, color="red",size = 1.5) +
-        annotation_custom(my_grob) +
-        expand_limits(y = c(0, 15000))
-
 ```
+## [1] 9.787606
+```
+
+For 10,000 cars, the expected number of traffic groups is 9.787606
+
+![](538Traffic_files/figure-html/unnamed-chunk-5-1.png)
 
 ***
 
@@ -83,25 +80,25 @@ Of these, (1) may be intuitive, but (2) requires a little reasoning.  Consider a
 
 With that in mind, we only have to look for cars which only moves forward in the line to find the maximum time until no traffic exists.  Remembering that cars can only move forward at most 1 spot each hour, that means we simply find the car that starts the greatest distance in line behind it's ending position.
 
-```{r, echo=FALSE}
-moveSlowest <-  function(orderVehicles){
-  if(length(orderVehicles)==0){
-    return(orderVehicles)
-  }
-  minIndex <- which.min(orderVehicles)
-  orderVehiclesRear <- c(orderVehicles[minIndex],head(orderVehicles, minIndex-1))
-  c(orderVehiclesRear, moveSlowest(tail(orderVehicles,length(orderVehicles)-minIndex)))
-}
-```
 
-```{r}
+
+
+```r
 numVehicles <- 50
 hours <- replicate(100000,  max(sample(numVehicles)-(1:numVehicles)))
 ggplot(data.frame(hours=hours), aes(hours, col="blue")) + geom_histogram(color="black",binwidth=1,fill=I("blue")) + 
         ggtitle(paste0("Number of Hours Until Traffic Clears for ", numVehicles, " Cars")) + 
         theme(plot.title = element_text(size=15, face="bold")) +
         xlab("Number of Hours")
+```
 
+![](538Traffic_files/figure-html/unnamed-chunk-7-1.png)
+
+```r
 mean(hours)
 ```
-For `r numVehicles` cars, the average number of hours until traffic clears is `r mean(hours)` hours
+
+```
+## [1] 41.73954
+```
+For 50 cars, the average number of hours until traffic clears is 41.73954 hours
