@@ -76,8 +76,10 @@ maxDF <- data.frame(maxesA, maxesB, cutoffs)
 p <- ggplot(resDF, aes(y=Var1, x=Var2))
 p + geom_tile(aes(fill=value)) + xlab("Player A cutoff") + ylab("Player B cutoff") +
     ggtitle("Player A win probability") +
-    scale_fill_gradientn(colours=c("navyblue","red"),breaks=.5,labels="Breakeven")+
+    scale_fill_gradientn("A win%",colours=c("navyblue","red"),breaks=.5,labels="Breakeven")+
     geom_rect(data=maxDF, aes(y=cutoffs, x=maxesB), size=.5, fill="black", colour="black", xmin=cutoffs-0.005, xmax=cutoffs+0.005, ymin=maxesB-0.005, ymax=maxesB+0.005) +
     geom_rect(data=maxDF, aes(y=maxesB, x=cutoffs), size=.5, fill="blue", colour="blue", xmin=maxesB-0.005, xmax=maxesB+0.005, ymin=cutoffs-0.005, ymax=cutoffs+0.005) +
     geom_point(x=.618,y=.618,color="white", size=2) + annotate("text",x=.618,y=.648, label="Optimal cutoff", col="white", size=5) + theme_bw()
 ```
+
+**Player A Win Probability:** Black highlights optimal play for Player B given Player A's cutoff. Blue highlights optimal play for Player A given Player B's cutoff. The white dot is the unbeatable cutoff for both players.
