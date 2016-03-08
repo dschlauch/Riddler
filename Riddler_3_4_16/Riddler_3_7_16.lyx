@@ -1,0 +1,329 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Can You Win This Hot New Game Show?
+\end_layout
+
+\begin_layout Author
+Dan Schlauch
+\end_layout
+
+\begin_layout Date
+March 6, 2016
+\end_layout
+
+\begin_layout Standard
+From the FiveThirtyEight Riddler
+\end_layout
+
+\begin_layout Standard
+http://fivethirtyeight.com/features/can-you-win-this-hot-new-game-show/
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Two players go on a hot new game show called “Higher Number Wins.” The two
+ go into separate booths, and each presses a button, and a random number
+ between zero and one appears on a screen.
+ (At this point, neither knows the other’s number, but they do know the
+ numbers are chosen from a standard uniform distribution.) They can choose
+ to keep that first number, or to press the button again to discard the
+ first number and get a second random number, which they must keep.
+ Then, they come out of their booths and see the final number for each player
+ on the wall.
+ The lavish grand prize — a case full of gold bullion — is awarded to the
+ player who kept the higher number.
+ Which number is the optimal cutoff for players to discard their first number
+ and choose another? Put another way, within which range should they choose
+ to keep the first number, and within which range should they reject it
+ and try their luck with a second number?
+\end_layout
+
+\begin_layout Part*
+Solution
+\end_layout
+
+\begin_layout Standard
+We can think about this by dividing the probabilities into the four possible
+ 
+\begin_inset Quotes eld
+\end_inset
+
+first-press
+\begin_inset Quotes erd
+\end_inset
+
+ outcomes.
+ These four come from Player A accepts/represses and Player B accepts/represses.
+\end_layout
+
+\begin_layout Standard
+If they both repress, it's easy...
+ its essentially a coinflip.
+ This happens with probability 
+\begin_inset Formula $a\times b$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If both accept, it's now a competition between a 
+\begin_inset Formula $Uniform\left(a,1\right)$
+\end_inset
+
+ and a 
+\begin_inset Formula $Uniform\left(b,1\right)$
+\end_inset
+
+ random variable.
+ This happens with probability 
+\begin_inset Formula $\left(1-a\right)\left(1-b\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Similarly, when one accepts and the other represses, we have a competition
+ between a 
+\begin_inset Formula $Uniform\left(0,1\right)$
+\end_inset
+
+ and a 
+\begin_inset Formula $Uniform\left(x,1\right)$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+We can write out the total probability as follows
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+P\left(Win_{A}|a,b\right) & = & P\left(Win_{A}|X_{1}<a,Y_{1}<b\right)+P\left(Win_{A}|X_{1}>a,Y_{1}>b\right)+\\
+ &  & P\left(Win_{A}|X_{1}<a,Y_{1}>b\right)+P\left(Win_{A}|X_{1}>a,Y_{1}<b\right)\\
+ & = & ab\left[\frac{1}{2}\right]+\left(1-a\right)\left(1-b\right)\left[.5\frac{\left(1-a\right)}{\left(1-b\right)}+\frac{\left(1-b\right)-\left(1-a\right)}{\left(1-b\right)}\right]+\\
+ &  & b\left(1-a\right)\left[1-\frac{\left(1-a\right)}{2}\right]+a\left(1-b\right)\left[\frac{\left(1-b\right)}{2}\right]
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To find the optimal value for 
+\begin_inset Formula $a$
+\end_inset
+
+ given 
+\begin_inset Formula $b$
+\end_inset
+
+, we simply differentiate and set equal to zero to get the max.
+ 
+\begin_inset Formula 
+\[
+\frac{d}{da}P\left(Win_{A}|a,b\right)=b\left[\frac{1}{2}\right]+\left[b-a\right]+\left[-ab\right]+\left(1-b\right)\left[\frac{\left(1-b\right)}{2}\right]=0
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Player A and Player B are in mirror situations, so to find an unbeatable
+ strategy we need to find a value for 
+\begin_inset Formula $a$
+\end_inset
+
+ (or 
+\begin_inset Formula $b$
+\end_inset
+
+) such that they are each other's maximum.
+ So we do this by setting 
+\begin_inset Formula $a=b=x$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Setting 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\frac{d}{da}P\left(Win_{A}|a,b\right)=0$
+\end_inset
+
+ and finding the equilibrium where 
+\begin_inset Formula $a=b$
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+x\left[\frac{1}{2}\right]+\left[x-x\right]+\left[-x^{2}\right]+\frac{x^{2}-2x+1}{2} & = & 0\\
+-\frac{1}{2}x^{2}-\frac{1x}{2}+\frac{1}{2} & = & 0
+\end{eqnarray*}
+
+\end_inset
+
+Using the quadratic formula we get
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+
+\begin_inset Formula 
+\begin{eqnarray*}
+x & = & \sqrt{\frac{5}{4}}-\frac{1}{2}\\
+x & = & 0.61803
+\end{eqnarray*}
+
+\end_inset
+
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+In other words, using a cutoff of 
+\begin_inset Formula $\approx.61803$
+\end_inset
+
+ is an unbeatable strategy.
+ But it may not be the best if your opponent is less than optimal.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename gameshow_heatmap.png
+	width 80page%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+
+\series bold
+Player A Win Probability
+\series default
+: Black highlights optimal play for Player B given Player A's cutoff.
+ Blue highlights optimal play for Player A given Player B's cutoff.
+ The white dot is the unbeatable cutoff for both players.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
