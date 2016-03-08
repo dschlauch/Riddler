@@ -1,0 +1,83 @@
+---
+title: "Can You Win This Hot New Game Show?"
+author: "Dan Schlauch"
+date: "03/04/2016"
+output: html_document
+---
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(grid)
+```
+[From The Riddler at fivethirtyeight.com](http://fivethirtyeight.com/features/can-you-win-this-hot-new-game-show/)
+
+*Two players go on a hot new game show called “Higher Number Wins.” The two go into separate booths, and each presses a button, and a random number between zero and one appears on a screen. (At this point, neither knows the other’s number, but they do know the numbers are chosen from a standard uniform distribution.) They can choose to keep that first number, or to press the button again to discard the first number and get a second random number, which they must keep. Then, they come out of their booths and see the final number for each player on the wall. The lavish grand prize — a case full of gold bullion — is awarded to the player who kept the higher number. Which number is the optimal cutoff for players to discard their first number and choose another? Put another way, within which range should they choose to keep the first number, and within which range should they reject it and try their luck with a second number?*
+
+# Solution 
+We can think about this by dividing the probabilities into the four possible “first-press” outcomes. These four come from Player A accepts/represses and Player B accepts/represses.
+
+If they both repress, it's easy... its essentially a coinflip. This happens with probability $a\times b$
+ 
+
+If both accept, it's now a competition between a $Uniform\left(a,1\right)$
+  and a $Uniform\left(b,1\right)$
+  random variable. This happens with probability $\left(1-a\right)\left(1-b\right)$
+ .
+
+Similarly, when one accepts and the other represses, we have a competition between a $Uniform\left(0,1\right)$
+  and a $Uniform\left(x,1\right)$.
+
+We can write out the total probability of Player A winning as follows:
+$$P\left(Win_{A}|a,b\right)    =	P\left(Win_{A}|X_{1}<a,Y_{1}<b\right)+P\left(Win_{A}|X_{1}>a,Y_{1}>b\right)+$$
+		$$P\left(Win_{A}|X_{1}<a,Y_{1}>b\right)+P\left(Win_{A}|X_{1}>a,Y_{1}<b\right)$$
+	$$=	ab\left[\frac{1}{2}\right]+\left(1-a\right)\left(1-b\right)\left[.5\frac{\left(1-a\right)}{\left(1-b\right)}+\frac{\left(1-b\right)-\left(1-a\right)}{\left(1-b\right)}\right]+$$
+		$$b\left(1-a\right)\left[1-\frac{\left(1-a\right)}{2}\right]+a\left(1-b\right)\left[\frac{\left(1-b\right)}{2}\right]$$
+To find the optimal value for $a$
+  given $b$, we simply differentiate and set equal to zero to get the max. $$\frac{d}{da}P\left(Win_{A}|a,b\right)=b\left[\frac{1}{2}\right]+\left[b-a\right]+\left[-ab\right]+\left(1-b\right)\left[\frac{\left(1-b\right)}{2}\right]=0$$
+ 
+
+Player A and Player B are in mirror situations, so to find an unbeatable strategy we need to find a value for $a$
+  (or $b$) such that they are each other's maximum. So we do this by setting $a=b=x$
+ 
+
+Setting $\frac{d}{da}P\left(Win_{A}|a,b\right)=0$
+  and finding the equilibrium where $a=b$
+ $$x\left[\frac{1}{2}\right]+\left[x-x\right]+\left[-x^{2}\right]+\frac{x^{2}-2x+1}{2}    =	0$$
+$$-\frac{1}{2}x^{2}-\frac{1x}{2}+\frac{1}{2}	=	0$$
+ Using the quadratic formula we get
+ $$x	=	\sqrt{\frac{5}{4}}-\frac{1}{2}$$
+$$x	\approx 0.61803$$
+
+In other words, using a cutoff of $\approx.61803$ is an unbeatable strategy. But it may not be the best if your opponent is less than optimal.
+
+```{r, message=FALSE, warning=FALSE,echo=FALSE,results="hide"}
+library(ggplot2)
+library(reshape2)
+getAWinner <- function(cutoffA, cutoffB){
+    intersectP <- ifelse(cutoffA>cutoffB, (((1-cutoffA)/(1-cutoffB))*.5+((1-cutoffB)-(1-cutoffA))/(1-cutoffB)),
+                         1-(((1-cutoffB)/(1-cutoffA))*.5+((1-cutoffA)-(1-cutoffB))/(1-cutoffA)))
+    cutoffA*cutoffB*.5 +
+        cutoffA*(1-cutoffB)*((1-cutoffB)/2) +
+        cutoffB*(1-cutoffA)*(1-(1-cutoffA)/2) + 
+        (1-cutoffA)*(1-cutoffB)*intersectP   
+}
+
+cutoffs<- seq(0,1,.005)
+resMat <- sapply(cutoffs, function(x){
+    sapply(cutoffs, function(y){getAWinner(x, y)})
+})
+
+rownames(resMat) <- cutoffs
+colnames(resMat) <- cutoffs
+resDF <- melt(resMat)
+maxesA <- apply(resMat,1,max)
+maxesB <- apply(resMat,2,max)
+maxDF <- data.frame(maxesA, maxesB, cutoffs)
+p <- ggplot(resDF, aes(y=Var1, x=Var2))
+p + geom_tile(aes(fill=value)) + xlab("Player A cutoff") + ylab("Player B cutoff") +
+    ggtitle("Player A win probability") +
+    scale_fill_gradientn(colours=c("navyblue","red"),breaks=.5,labels="Breakeven")+
+    geom_rect(data=maxDF, aes(y=cutoffs, x=maxesB), size=.5, fill="black", colour="black", xmin=cutoffs-0.005, xmax=cutoffs+0.005, ymin=maxesB-0.005, ymax=maxesB+0.005) +
+    geom_rect(data=maxDF, aes(y=maxesB, x=cutoffs), size=.5, fill="blue", colour="blue", xmin=maxesB-0.005, xmax=maxesB+0.005, ymin=cutoffs-0.005, ymax=cutoffs+0.005) +
+    geom_point(x=.618,y=.618,color="white", size=2) + annotate("text",x=.618,y=.648, label="Optimal cutoff", col="white", size=5) + theme_bw()
+```
