@@ -1,0 +1,42 @@
+---
+title: "Should You Shoot Free Throws Underhand?"
+author: "Dan Schlauch"
+date: "03/11/2016"
+output: html_document
+---
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(grid)
+```
+[From The Riddler at fivethirtyeight.com](http://fivethirtyeight.com/features/should-you-shoot-free-throws-underhand/)
+
+*Hark! The NCAA Tournament starts next week, and the “granny shot” has reappeared as a free throw technique. Its proponents claim that it improves accuracy because there are fewer moving parts — the elbows and wrists are held more stable, for example, and the move is symmetric because one’s arms are, more or less, equal length. Let’s find out how effective the granny shot really is.*
+
+*Consider the following simplified model of free throws. Imagine the rim to be a circle (which we’ll call C) that has a radius of 1, and is centered at the origin (the point (0,0)). Let V be a random point in the plane, with coordinates X and Y, and where X and Y are independent normal random variables, with means equal to zero and each having equal variance — think of this as the point where your free throw winds up, in the rim’s plane. If V is in the circle, your shot goes in. Finally, suppose that the variance is chosen such that the probability that V is in C is exactly 75 percent (roughly the NBA free-throw average).*
+
+*But suppose you switch it up, and go granny-style, which in this universe eliminates any possible left-right error in your free throws. What’s the probability you make your shot now? (Put another way, calculate the probability that |Y| < 1.)*
+
+# Solution 
+ 
+Let $X$ and $Y$ be standard normal random variables representing the x and y components of the free throw.
+
+The free throw is outside a radius, $\gamma$, if $X^{2}+Y^{2}>\gamma$.
+Let $Z=X^{2}+Y^{2}$, so $Z  \sim \chi^{2}_{2}$
+
+Now, letting the success rate be 75%, we find $\gamma$ via
+```{r}
+qchisq(.75,2)
+```
+
+So, $P(Z<`r qchisq(.75,2)`)=.75$
+
+And, now with $\gamma$, we find 
+
+```{r}
+pchisq(qchisq(.75,2),1)
+```
+
+$P(X^{2}<`r qchisq(.75,2)`)=`r pchisq(qchisq(.75,2),1)`$
+
+So, we've improved from a 75% free throw percentage to a 90.4% free throw percentage
