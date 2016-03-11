@@ -40,3 +40,14 @@ pchisq(qchisq(.75,2),1)
 $P(X^{2}<`r qchisq(.75,2)`)=`r pchisq(qchisq(.75,2),1)`$
 
 So, we've improved from a 75% free throw percentage to a 90.4% free throw percentage
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-1485189-5', 'auto');
+  ga('send', 'pageview');
+
+</script>
