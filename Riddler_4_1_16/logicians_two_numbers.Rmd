@@ -1,0 +1,93 @@
+---
+title: "Can You Solve The Impossible Puzzle?"
+author: "Dan Schlauch"
+date: "04/1/2016"
+output: html_document
+---
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(grid)
+```
+[From The Riddler at fivethirtyeight.com](http://fivethirtyeight.com/features/can-you-solve-the-impossible-puzzle/)
+
+*Three very skilled logicians are sitting around a table — Barack, Pete and Susan. Barack says: “I’m thinking of two natural numbers between 1 and 9, inclusive. I’ve written the product of these two numbers on this paper that I’m giving to you, Pete. I’ve written the sum of the two numbers on this paper that I’m giving to you, Susan. Now Pete, looking at your paper, do you know which numbers I’m thinking of?”*
+
+*Pete looks at his paper and says: “No, I don’t.”*
+
+*Barack turns to Susan and asks: “Susan, do you know which numbers I’m thinking of?” Susan looks at her paper and says: “No.”*
+
+*Barack turns back to Pete and asks: “How about now? Do you know?”*
+
+*“No, I still don’t,” Pete says.*
+
+*Barack keeps going back and forth, and when he asks Pete for the fifth time, Pete says: “Yes, now I know!”*
+
+*First, what are the two numbers? Second, if Pete had said no the fifth time, would Susan have said yes or no at her fifth turn?*
+
+# Solution 
+ 
+We can set up a matrix of possible combinations of the two numbers.  Given that order does not matter, we can simply take this to be th upper triangular matrix with the diagonal included.  We're going to update this matrix as new information emerges.
+
+When a person, Susan or Pete says that they do not know the answer, that means that of the remaining possible pairs of numbers, the answer cannot be one where the sum (for Susan) or product (for Pete) is unique.  All those combinations that are unique are therefore eliminated.
+
+When one logician finally says they know the answer, the answer must be a remaining number that is unique.  In the case of Pete knowing on his 5th turn, there was only one possible unique combination.. 2 and 8.
+
+
+```{r}
+roundsOfNo <- 4
+whoSaysYes <- "Pete"
+numberOfPossibleNumbers <- 9
+
+pete <- (1:numberOfPossibleNumbers)%*%t(1:numberOfPossibleNumbers)
+susan <- sapply(1:numberOfPossibleNumbers, function(i){i+1:numberOfPossibleNumbers})
+possibleResults <- upper.tri(susan, diag=T)
+
+
+saysNo <- function(personalNumbers){
+    counts <- table(personalNumbers[possibleResults])
+    possibleResults[personalNumbers%in%as.numeric(names(counts[counts==1]))] <<- F
+}
+
+for (i in 1:roundsOfNo){
+    saysNo(pete)
+    saysNo(susan)
+}
+if (whoSaysYes=="Pete"){
+    counts <- table(pete[possibleResults])
+    print(which(possibleResults&pete==as.numeric(names(counts[counts==1])), arr.ind=T))
+} else if (whoSaysYes=="Susan"){
+    saysNo(pete)
+    counts <- table(susan[possibleResults])
+    print(which(possibleResults&susan==as.numeric(names(counts[counts==1])), arr.ind=T))
+}
+```
+
+Next, we're asked *"if Pete had said no the fifth time, would Susan have said yes or no at her fifth turn?"*
+
+
+```{r}
+saysNo(pete)
+table(susan[possibleResults])
+```
+Here, there are 4 possible sums that Susan could have (6, 9, 10, or 11).  But each of the sums has two possible combination pairs remaining, so Susan would still not have known the answer if Pete had said "No" in round 5.
+
+We can continue on to see how Pete would then have responded...
+
+```{r}
+saysNo(susan)
+table(pete[possibleResults])
+```
+
+Now we see that Pete is in the exact same situation.  He can no longer eliminate any of the remaining combination pairs because each of the four products that he could have (8, 9, 18, 24) each have two remaining possible pairs.  Continuing on like this infinitely, Pete and Susan will never be able to discover the hidden number pair.
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-1485189-5', 'auto');
+  ga('send', 'pageview');
+
+</script>
