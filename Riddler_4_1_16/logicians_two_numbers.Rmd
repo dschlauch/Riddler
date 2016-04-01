@@ -81,6 +81,12 @@ table(pete[possibleResults])
 
 Now we see that Pete is in the exact same situation.  He can no longer eliminate any of the remaining combination pairs because each of the four products that he could have (8, 9, 18, 24) each have two remaining possible pairs.  Continuing on like this infinitely, Pete and Susan will never be able to discover the hidden number pair.
 
+
+These remaining possible pairs cannot be uniquely distinguished by their sums and products.
+```{r}
+which(possibleResults, arr.ind=T)
+```
+
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
